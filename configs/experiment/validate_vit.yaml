@@ -21,10 +21,8 @@ train: false
 test: true
 
 num_scales: 2
-#thresholds: [0.087] #, 0.03]
-#thresholds: [0.035, 0.035]
-thresholds: [4.5]
-#thresholds: [0.000303] #, 0.000025]
+thresholds: [5.5]
+
 img_size: 336
 patch_size: 14
 
@@ -62,7 +60,7 @@ model:
     image_size: ${img_size}
     mean: [0.48145466, 0.4578275, 0.40821073]
     std: [0.26862954, 0.26130258, 0.27577711]
-    method: "upsample_mse"  # Options: "entropy" or "laplacian"
+    method: "entropy"  # Options: "entropy" or "laplacian"
     laplacian_aggregate: "mean"  # Options: "mean", "max", or "std" (only used if method is "laplacian")
   compile: false
 

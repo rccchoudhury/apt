@@ -1,0 +1,103 @@
+# @package _global_
+
+# to execute this validation run:
+# python src/train.py experiment=train_vit_transformer
+
+defaults:
+  - /model_variant@model: vit_base_patch16_384
+  - /data_variant@data: vit_base_patch16_384
+  - override /data: imagenet
+  - override /model: vit
+  - override /trainer: default
+  - override /callbacks: eval
+  #- override /logger: wandb
+  #- _self_
+
+tags: ["imagenet", "vit_ours", "train"]
+
+seed: 42
+
+# Disable training and testing
+train: true
+test: false
+
+num_scales: 2
+thresholds: [5.5]
+img_size: 384
+patch_size: 16
+
+trainer:
+  accelerator: "gpu"
+  devices: 8
+  precision: "16-mixed"
+  enable_checkpointing: false
+  accumulate_grad_batches: 1
+  max_epochs: 5
+  #limit_train_batches: 1.0
+  #limit_val_batches: 0.2
+  strategy:
+    _target_: lightning.pytorch.strategies.DDPStrategy
+    find_unused_parameters: false
+    gradient_as_bucket_view: true
+  logger: false
+
+model:
+  label_smoothing: 0.1
+  match_head_shape: true
+  net:
+    _target_: src.models.vision_transformer.VisionTransformer 
+    img_size: ${img_size}
+    patch_size: ${patch_size}
+    mixed_patch_embed:
+      _target_: src.models.patch_embed.TokenizedZeroConvPatchAttn
+      _partial_: true
+      patch_size: ${patch_size}
+    num_scales: ${num_scales}
+    alpha_schedule: false
+    thresholds: ${thresholds}
+    global_pool: 'token' # use this for some models
+    no_embed_class: false
+    drop_path_rate: 0.1
+    #patch_drop_rate: 0.356
+    weight_init: 'skip'
+  tokenizer: 
+    _target_: src.models.patch_tokenizer.PatchTokenizer
+    base_patch_size: ${patch_size}
+    num_scales: ${num_scales}
+    thresholds: ${thresholds}
+    image_size: ${img_size}
+    method: "entropy" # or entropy, or laplacian
+    mean: [0.5, 0.5, 0.5]
+    std: [0.5, 0.5, 0.5]
+  compile: false
+  scheduler_cfg: 
+    _target_: src.models.optim_utils.CosineSchedulerConfig
+    # Partial bc batch size depends on other stuff.
+    warmup_epochs: 5
+    total_epochs: 50
+    lr: 5e-4
+    end_lr: 1e-6
+    start_lr: 1e-6
+  optimizer: 
+    lr: 1
+    _target_: torch.optim.AdamW
+    _partial_: true
+    betas: [0.9, 0.999]
+    weight_decay: 0.05
+
+data:
+  _target_: src.data.imagenet_module.ImagenetDataModuleWithEntropy
+  img_size: ${img_size}
+  num_scales: ${num_scales}
+  patch_size: ${patch_size}
+  augment: 
+    _target_: src.data.imagenet_module.AugmentConfig
+    color_jitter: 0.0
+    auto_augment: 'rand-m9-mstd0.5-inc1'
+    interpolation: 'bicubic'
+    re_prob: 0.25
+    re_mode: 'const' # use instead of pixel so we can get rid of toks
+    eval_crop_ratio: 0.875
+  batch_size: 32
+  num_workers: 12
+  pin_memory: true
