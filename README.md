@@ -1,10 +1,13 @@
 <div align="center">
 
-# [Accelerating Vision Transformers With Adaptive Patch Sizes](https://arxiv.org/abs/2510.18091)
+# [Accelerating Vision Transformers With Adaptive Patch Sizes (ICLR 2026)](https://arxiv.org/abs/2510.18091)
 
 **Rohan Choudhury\*<sup>1</sup>, JungEun Kim\*<sup>2,3</sup>, Jinhyung Park<sup>1</sup>, Eunho Yang<sup>2</sup>, László A. Jeni<sup>1</sup>, Kris M. Kitani<sup>1</sup>**
 
 <sup>1</sup>Carnegie Mellon University, <sup>2</sup>KAIST, <sup>3</sup>General Robotics
+
+[![Paper](https://img.shields.io/badge/Paper-arXiv-b31b1b.svg)](https://arxiv.org/abs/2510.18091)
+[![Project Page](https://img.shields.io/badge/Project-Page-blue.svg)](https://rccchoudhury.github.io/apt/)
 
 <table>
   <tr>
@@ -116,3 +119,17 @@ python scripts/gen_visualization_single.py \
 ```
 
 Essential parameters: `--input` (required), `--output`, `--method` (entropy/laplacian/upsample_mse), `--vis_type` (entropy/grid/none), `--patch_size`, `--num_scales`, `--thresholds`.
+
+## Citation
+
+If you use our code or the paper, please cite our work:
+
+```bibtex
+@article{choudhury2025apt,
+  title={Accelerating Vision Transformers with Adaptive Patch Sizes},
+  author={Choudhury, Rohan and Kim, JungEun and Park, Jinhyung and Yang, Eunho and Jeni, L{\'a}szl{\'o} A. and Kitani, Kris M.},
+  journal={arXiv preprint arXiv:2510.18091},
+  year={2025},
+  url={https://arxiv.org/abs/2510.18091},
+  doi={10.48550/arXiv.2510.18091}
+}
